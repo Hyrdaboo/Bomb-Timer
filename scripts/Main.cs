@@ -52,13 +52,11 @@ public partial class Main : Node
 
     bool pressedLastFrame;
     Vector2I offset;
-    float timerLast = float.MaxValue;
     public override void _Process(double delta)
     {
-        if (bombTimer.TimeLeft > 0 && bombTimer.TimeLeft <= 10 && timerLast > 10)
+        if (!beep.Playing && bombTimer.TimeLeft <= 10 && !bombTimer.IsStopped())
         {
             beep.Play();
-            timerLast = (float)bombTimer.TimeLeft;
         }
         lineEdit.Text = GetTimeLeft();
 
@@ -81,6 +79,13 @@ public partial class Main : Node
             window.Size = Vector2I.One * Mathf.Max(200, window.Size.Y - 10);
 
             PlayerPrefs.SetInt("size", window.Size.Y);
+        }
+
+        if (Input.IsActionJustPressed("Reset"))
+        {
+            bombTimer.Stop();
+            beep.Stop();
+            lineEdit.GrabFocus();
         }
 
         if (Input.IsMouseButtonPressed(MouseButton.Left))
@@ -149,13 +154,13 @@ public partial class Main : Node
     private void OnStop()
     {
         lineEdit.GrabFocus();
-        explosionWindow.Show();
-        animatedSprite.Play();
 
         time = "";
-        timerLast = float.MaxValue;
         beep.Stop();
+
+        explosionWindow.Show();
         bombexpl.Play();
+        animatedSprite.Play();
     }
 
     private string GetTimeLeft()
