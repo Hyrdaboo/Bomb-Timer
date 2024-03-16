@@ -1,0 +1,36 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="BombTimer"
+config/features=PackedStringArray("4.2", "C#", "Forward Plus")
+boot_splash/bg_color=Color(0, 0, 0, 0)
+boot_splash/show_image=false
+config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=512
+window/size/viewport_height=512
+window/size/resizable=false
+window/size/always_on_top=true
+window/subwindows/embed_subwindows=false
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/per_pixel_transparency/allowed=true
+
+[dotnet]
+
+project/assembly_name="BombTimer"
+
+[rendering]
+
+environment/defaults/default_clear_color=Color(0, 0, 0, 0)
