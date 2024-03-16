@@ -1,8 +1,10 @@
 using Godot;
+using Godot.Collections;
+using System.Text;
 
 public partial class Main : Node
 {
-    [Export] private AudioStreamPlayer startSound;
+    [Export] private Array<AudioStreamPlayer> startSounds;
     [Export] private AudioStreamPlayer bombexpl;
     [Export] private AudioStreamPlayer beep;
 
@@ -11,10 +13,20 @@ public partial class Main : Node
     private Window explosionWindow;
     private AnimatedSprite2D animatedSprite;
 
+    private int startSoundIndex = 0;
+
     public override void _Ready()
     {
         DisplayServer.WindowSetFlag(DisplayServer.WindowFlags.Transparent, true);
-        GetViewport().GetWindow().Borderless = true;
+        GetWindow().Borderless = true;
+
+        int size = PlayerPrefs.GetInt("size", 512);
+        int curInd = PlayerPrefs.GetInt("ss_ind");
+        GetWindow().Size = Vector2I.One * size;
+        GetWindow().MoveToCenter();
+        startSoundIndex = curInd;
+        PlayerPrefs.SetInt("ss_ind", startSoundIndex);
+        PlayerPrefs.SetInt("size", size);
 
         explosionWindow = this.FindChildOfType<Window>() as Window;
         explosionWindow.Borderless = true;
@@ -38,6 +50,8 @@ public partial class Main : Node
         lineEdit.TextSubmitted += Start;
     }
 
+    bool pressedLastFrame;
+    Vector2I offset;
     float timerLast = float.MaxValue;
     public override void _Process(double delta)
     {
@@ -47,6 +61,40 @@ public partial class Main : Node
             timerLast = (float)bombTimer.TimeLeft;
         }
         lineEdit.Text = GetTimeLeft();
+
+        if (Input.IsActionJustPressed("Minimize"))
+        {
+            GetWindow().Mode = Window.ModeEnum.Minimized;
+        }
+
+        if (Input.IsActionJustPressed("SizeUp"))
+        {
+            Window window = GetWindow();
+            window.Size = Vector2I.One * Mathf.Min(DisplayServer.ScreenGetSize().Y, window.Size.Y + 10);
+
+            PlayerPrefs.SetInt("size", window.Size.Y);
+        }
+
+        if (Input.IsActionJustPressed("SizeDown"))
+        {
+            Window window = GetWindow();
+            window.Size = Vector2I.One * Mathf.Max(200, window.Size.Y - 10);
+
+            PlayerPrefs.SetInt("size", window.Size.Y);
+        }
+
+        if (Input.IsMouseButtonPressed(MouseButton.Left))
+        {
+            if (!pressedLastFrame)
+            {
+                offset = DisplayServer.MouseGetPosition() - GetWindow().Position;
+                pressedLastFrame = true;
+            }
+
+            GetWindow().Position = DisplayServer.MouseGetPosition() - offset;
+        }
+        else
+            pressedLastFrame = false;
     }
 
     string time = "";
@@ -54,27 +102,38 @@ public partial class Main : Node
     {
         if (@event is InputEventKey e && e.Pressed && !e.IsEcho() && bombTimer.TimeLeft == 0 && !e.IsAction("ui_accept"))
         {
-            if (e.Keycode == Key.Backspace && !string.IsNullOrEmpty(time))
-                time = time.Remove(0, 1);
-
             string code = e.AsTextKeycode();
+            if (code.Contains("Ctrl"))
+            {
+                if ("0123".Contains(code[^1]))
+                {
+                    startSoundIndex = int.Parse(code[^1].ToString());
+                    PlayerPrefs.SetInt("ss_ind", startSoundIndex);
+                }
+                return;
+            }
+
+            if (e.Keycode == Key.Backspace)
+                time = "";
+
             if ("0123456789".Contains(code) && !(time == "" && code == "0"))
             {
-                if (time.Length >= 4)
+                if (time.Length >= 6)
                     time = "";
                 time += e.AsTextKeycode();
             }
 
-            if (string.IsNullOrEmpty(time))
-                bombTimer.WaitTime = 0.01f;
-            else
-                bombTimer.WaitTime = Mathf.Max(0.01f, time.Length <= 2 ? int.Parse(time) :
-                int.Parse(time[..^2]) * 60 + int.Parse(time.Substring(time.Length - 2, 2)));
-        }
+            StringBuilder sb = new StringBuilder("000000");
+            for (int i = 0; i < time.Length; i++)
+            {
+                sb[^(time.Length-i)] = time[i];
+            }
+            string time_formatted = sb.ToString();
 
-        if (@event is InputEventMouseMotion mm && Input.IsMouseButtonPressed(MouseButton.Left))
-        {
-            GetViewport().GetWindow().Position += (Vector2I)mm.Relative;
+            int hours = Mathf.Min(24, int.Parse(time_formatted[..2]));
+            int minutes = Mathf.Min(60, int.Parse(time_formatted[2..4]));
+            int seconds = Mathf.Min(60, int.Parse(time_formatted[4..6]));
+            bombTimer.WaitTime = Mathf.Max(hours * 3600 + minutes*60 + seconds, 0.01f);
         }
     }
 
@@ -84,7 +143,7 @@ public partial class Main : Node
             return;
         lineEdit.ReleaseFocus();
         bombTimer.Start();
-        startSound.Play();
+        startSounds[startSoundIndex].Play();
     }
 
     private void OnStop()
@@ -103,9 +162,10 @@ public partial class Main : Node
     {
         double t = bombTimer.TimeLeft > 0 ? bombTimer.TimeLeft : bombTimer.WaitTime;
 
-        int minutes = (int)t / 60;
+        int hours = (int)t / 3600;
+        int minutes = (int)(t / 60) % 60;
         int seconds = (int)t % 60;
 
-        return $"{minutes.ToString().PadLeft(2, '0')}:{seconds.ToString().PadLeft(2, '0')}";
+        return $"{hours.ToString().PadLeft(2, '0')}:{minutes.ToString().PadLeft(2, '0')}:{seconds.ToString().PadLeft(2, '0')}";
     }
 }
