@@ -1,5 +1,0 @@
-[gd_scene format=3 uid="uid://dh5k2hpf75bnm"]
-
-[node name="ContextMenu" type="Window"]
-position = Vector2i(0, 36)
-unresizable = true
