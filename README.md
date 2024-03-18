@@ -6,9 +6,12 @@
   <br>
 </h1>
 
-A simple timer widget that looks like a cs 1.6 bomb inspired by <a href="https://www.youtube.com/@tokyospliff/featured">tokyospliff's</a> streams.
+A simple timer app that looks like a cs 1.6 bomb inspired by one <a href="https://www.youtube.com/@tokyospliff/featured">tokyospliff</a> uses in his streams.
 
 <img src="screenshots/preview.gif" width="100%">
+
+### Download
+Go to the <a href="https://github.com/Hyrdaboo/Bomb-Timer/releases/">releases page</a> and choose the build for your OS(windows, linux)
 
 ### Controls
 
