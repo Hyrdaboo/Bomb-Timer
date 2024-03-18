@@ -4,13 +4,13 @@ using System.Text;
 
 public partial class Main : Node
 {
+    [Export] private Window explosionWindow;
     [Export] private Array<AudioStreamPlayer> startSounds;
     [Export] private AudioStreamPlayer bombexpl;
     [Export] private AudioStreamPlayer beep;
 
     private LineEdit lineEdit;
     private Timer bombTimer;
-    private Window explosionWindow;
     private AnimatedSprite2D animatedSprite;
 
     private int startSoundIndex = 0;
@@ -28,7 +28,6 @@ public partial class Main : Node
         PlayerPrefs.SetInt("ss_ind", startSoundIndex);
         PlayerPrefs.SetInt("size", size);
 
-        explosionWindow = this.FindChildOfType<Window>() as Window;
         explosionWindow.Borderless = true;
         explosionWindow.Size = new Vector2I(DisplayServer.ScreenGetSize().Y, DisplayServer.ScreenGetSize().Y);
         explosionWindow.Mode = Window.ModeEnum.Maximized;
@@ -49,9 +48,7 @@ public partial class Main : Node
         lineEdit.GrabFocus();
         lineEdit.TextSubmitted += Start;
     }
-
-    bool pressedLastFrame;
-    Vector2I offset;
+    
     public override void _Process(double delta)
     {
         if (!beep.Playing && bombTimer.TimeLeft <= 10 && !bombTimer.IsStopped())
@@ -59,6 +56,8 @@ public partial class Main : Node
             beep.Play();
         }
         lineEdit.Text = GetTimeLeft();
+        
+        HandleWindowDrag();
 
         if (Input.IsActionJustPressed("Minimize"))
         {
@@ -88,18 +87,10 @@ public partial class Main : Node
             lineEdit.GrabFocus();
         }
 
-        if (Input.IsMouseButtonPressed(MouseButton.Left))
+        if (Input.IsActionJustPressed("Quit"))
         {
-            if (!pressedLastFrame)
-            {
-                offset = DisplayServer.MouseGetPosition() - GetWindow().Position;
-                pressedLastFrame = true;
-            }
-
-            GetWindow().Position = DisplayServer.MouseGetPosition() - offset;
+            GetTree().Quit();
         }
-        else
-            pressedLastFrame = false;
     }
 
     string time = "";
@@ -110,7 +101,7 @@ public partial class Main : Node
             string code = e.AsTextKeycode();
             if (code.Contains("Ctrl"))
             {
-                if ("0123".Contains(code[^1]))
+                if ("01234".Contains(code[^1]))
                 {
                     startSoundIndex = int.Parse(code[^1].ToString());
                     PlayerPrefs.SetInt("ss_ind", startSoundIndex);
@@ -118,15 +109,16 @@ public partial class Main : Node
                 return;
             }
 
-            if (e.Keycode == Key.Backspace)
-                time = "";
-
             if ("0123456789".Contains(code) && !(time == "" && code == "0"))
             {
                 if (time.Length >= 6)
                     time = "";
                 time += e.AsTextKeycode();
             }
+            else if (e.Keycode == Key.Backspace)
+                time = "";
+            else
+                return;
 
             StringBuilder sb = new StringBuilder("000000");
             for (int i = 0; i < time.Length; i++)
@@ -172,5 +164,23 @@ public partial class Main : Node
         int seconds = (int)t % 60;
 
         return $"{hours.ToString().PadLeft(2, '0')}:{minutes.ToString().PadLeft(2, '0')}:{seconds.ToString().PadLeft(2, '0')}";
+    }
+
+    bool pressedLastFrame;
+    Vector2I offset;
+    private void HandleWindowDrag()
+    {
+        if (Input.IsMouseButtonPressed(MouseButton.Left))
+        {
+            if (!pressedLastFrame)
+            {
+                offset = DisplayServer.MouseGetPosition() - GetWindow().Position;
+                pressedLastFrame = true;
+            }
+
+            GetWindow().Position = DisplayServer.MouseGetPosition() - offset;
+        }
+        else
+            pressedLastFrame = false;
     }
 }

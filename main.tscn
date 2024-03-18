@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://dlcxb3sga0p0a"]
+[gd_scene load_steps=29 format=3 uid="uid://dlcxb3sga0p0a"]
 
 [ext_resource type="Script" path="res://scripts/Main.cs" id="1_45pf8"]
 [ext_resource type="Texture2D" uid="uid://dojovptpx828b" path="res://assets/bomb_modified.png" id="2_1k5j7"]
@@ -10,6 +10,7 @@
 [ext_resource type="AudioStream" uid="uid://bmx17iurpvgki" path="res://sfx/c4_beep1.wav" id="7_372w1"]
 [ext_resource type="AudioStream" uid="uid://ngyvopcvj2mw" path="res://sfx/moveout.wav" id="7_efe6d"]
 [ext_resource type="AudioStream" uid="uid://c8y3x5q02jdcs" path="res://sfx/locknload.wav" id="8_srk6p"]
+[ext_resource type="AudioStream" uid="uid://c3usftpbd1pv" path="res://sfx/com_go.wav" id="9_qbmmh"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_b0qbm"]
 atlas = ExtResource("5_im7l5")
@@ -131,7 +132,7 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Node2D" type="Control" node_paths=PackedStringArray("startSounds", "bombexpl", "beep")]
+[node name="Node2D" type="Control" node_paths=PackedStringArray("explosionWindow", "startSounds", "bombexpl", "beep")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -141,9 +142,10 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_45pf8")
-startSounds = [NodePath("startSound0"), NodePath("startSound1"), NodePath("startSound2"), NodePath("startSound3")]
-bombexpl = NodePath("bombexpl")
-beep = NodePath("beep")
+explosionWindow = NodePath("ExplosionWindow")
+startSounds = [NodePath("Sounds/startSound0"), NodePath("Sounds/startSound1"), NodePath("Sounds/startSound2"), NodePath("Sounds/startSound3"), NodePath("Sounds/startSound4")]
+bombexpl = NodePath("Sounds/bombexpl")
+beep = NodePath("Sounds/beep")
 
 [node name="TextureRect" type="TextureRect" parent="."]
 layout_mode = 1
@@ -177,7 +179,7 @@ context_menu_enabled = false
 flat = true
 caret_blink = true
 
-[node name="Window" type="Window" parent="."]
+[node name="ExplosionWindow" type="Window" parent="."]
 disable_3d = true
 transparent_bg = true
 title = "EXPLOSION"
@@ -187,30 +189,35 @@ always_on_top = true
 transparent = true
 unfocusable = true
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Window"]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="ExplosionWindow"]
 sprite_frames = SubResource("SpriteFrames_rp5ol")
 frame = 15
 frame_progress = 1.0
 speed_scale = 2.0
 centered = false
 
-[node name="Camera2D" type="Camera2D" parent="Window"]
+[node name="Camera2D" type="Camera2D" parent="ExplosionWindow"]
 anchor_mode = 0
 
-[node name="startSound0" type="AudioStreamPlayer" parent="."]
+[node name="Sounds" type="Node" parent="."]
+
+[node name="startSound0" type="AudioStreamPlayer" parent="Sounds"]
 stream = ExtResource("2_f37mc")
 
-[node name="startSound1" type="AudioStreamPlayer" parent="."]
+[node name="startSound1" type="AudioStreamPlayer" parent="Sounds"]
 stream = ExtResource("6_hbyvv")
 
-[node name="startSound2" type="AudioStreamPlayer" parent="."]
+[node name="startSound2" type="AudioStreamPlayer" parent="Sounds"]
 stream = ExtResource("7_efe6d")
 
-[node name="startSound3" type="AudioStreamPlayer" parent="."]
+[node name="startSound3" type="AudioStreamPlayer" parent="Sounds"]
 stream = ExtResource("8_srk6p")
 
-[node name="bombexpl" type="AudioStreamPlayer" parent="."]
+[node name="startSound4" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource("9_qbmmh")
+
+[node name="bombexpl" type="AudioStreamPlayer" parent="Sounds"]
 stream = ExtResource("3_yo4v8")
 
-[node name="beep" type="AudioStreamPlayer" parent="."]
+[node name="beep" type="AudioStreamPlayer" parent="Sounds"]
 stream = ExtResource("7_372w1")
