@@ -12,6 +12,9 @@ A simple timer widget that looks like a cs 1.6 bomb inspired by <a href="https:/
 
 ### Controls
 
+Enter time in HH:MM:SS format (ex. 01:21:25 would be 12125)<br>
+Clear with <b>Backspace</b>
+
 <table>
   <tr>
     <th>Shortcut</th>
