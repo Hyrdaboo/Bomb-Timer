@@ -6,7 +6,7 @@
   <br>
 </h1>
 
-A simple timer app that looks like a cs 1.6 bomb inspired by one <a href="https://www.youtube.com/@tokyospliff/featured">tokyospliff</a> uses in his streams.
+A simple timer app that looks like a csgo bomb inspired by one <a href="https://www.youtube.com/@tokyospliff/featured">tokyospliff</a> uses in his streams.
 
 <img src="screenshots/preview.gif" width="100%">
 
@@ -52,3 +52,8 @@ Clear with <b>Backspace</b>
     <td>Sets the start sound to appropriate index (0 by default)</td>
   </tr>
 </table>
+
+
+<br><br>
+> **Update**  
+> There is a new different version of the app which is an improvement over this one in many ways and has a couple more features. <a href="https://github.com/Stelusteee/BombTimer">Check it out</a> if you're interested
